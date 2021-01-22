@@ -3,7 +3,7 @@ const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 
 const app = express();
-const Post = require("./models/post");
+const postRoutes=require("./routes/posts")
 
 mongoose
   .connect(
@@ -28,36 +28,11 @@ app.use((req, res, next) => {
   );
   res.setHeader(
     "Access-Control-Allow-Methods",
-    "GET,POST,OPTIONS,PATCH,DELETE"
+    "GET,POST,OPTIONS,PUT,PATCH,DELETE"
   );
   next();
 });
 
-app.post("/posts", (req, res, next) => {
-  const post = new Post({
-    title: req.body.title,
-    content: req.body.content,
-  });
-  post.save();
-  res.status(201).json({ message: "Posts successfully added",post: post});
-});
-
-app.get("/posts", (req, res, next) => {
-  Post.find().then((docs) => {
-    res.status(201).json({
-      message: "Posts fetched successfully",
-      posts: docs,
-    });
-  });
-});
-
-app.delete("/posts/:id", (req, res) => {
-  Post.deleteOne({ _id: req.params.id }).then((result) => {
-    console.log(result);
-    res.status(201).json({
-      message: "Post deleted successfully",
-    });
-  });
-});
+app.use("/api/posts",postRoutes)
 
 module.exports = app;
