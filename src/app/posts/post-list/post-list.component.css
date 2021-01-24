@@ -7,9 +7,6 @@
   text-align: center;
 }
 
-mat-spinner{
-  margin:auto
-}
 
 .post-image{
   width:100%;
@@ -19,4 +16,12 @@ mat-spinner{
   width:100%;
   margin-bottom: 2rem;
   box-shadow: 1px 1px 5px rgba(0,0,0,0.65)
+}
+
+mat-spinner{
+  margin:auto
+}
+
+mat-paginator{
+  margin-top:1rem;
 }

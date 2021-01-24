@@ -42,10 +42,21 @@ router.post(
 );
 
 router.get("", (req, res, next) => {
-  Post.find().then((docs) => {
+  const pageSize = +req.query.pagesize;
+  const currentPage = +req.query.page;
+  const postQuery = Post.find();
+  let docs
+  if (pageSize && currentPage) {
+    postQuery.skip(pageSize * (currentPage - 1)).limit(pageSize);
+  }
+  postQuery.then(documents=>{
+    docs = documents
+    return Post.countDocuments()
+  }).then((count) => {
     res.status(201).json({
       message: "Posts fetched successfully",
       posts: docs,
+      maxPosts:count
     });
   });
 });
@@ -61,7 +72,7 @@ router.get("/:id", (req, res, next) => {
 });
 
 router.put("/:id", multer({ storage: storage }).single("image"), (req, res) => {
-  let imagePath=req.body.imagePath;
+  let imagePath = req.body.imagePath;
   if (req.file) {
     const url = req.protocol + "://" + req.get("host");
     imagePath = url + "/images/" + req.file.filename;
@@ -71,7 +82,7 @@ router.put("/:id", multer({ storage: storage }).single("image"), (req, res) => {
     _id: req.params.id,
     title: req.body.title,
     content: req.body.content,
-    imagePath: imagePath
+    imagePath: imagePath,
   };
   Post.updateOne({ _id: req.params.id }, post).then((result) => {
     res.status(201).json({
