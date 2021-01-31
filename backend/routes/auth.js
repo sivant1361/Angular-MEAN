@@ -41,14 +41,15 @@ router.post("/login", (req, res) => {
       }
       const token = jwt.sign(
         { email: fetchUser.email, userId: fetchUser._id },
-        "iam-not-gonna-tell-what-the-password-is",
+        "i-am-not-gonna-tell-what-the-password-is",
         {
           expiresIn: "1h",
         }
       );
       res.status(201).json({
         token: token,
-        message:"Authentication successful"
+        message:"Authentication successful",
+        expiresIn: 3600
       })
     })
     .catch((err) => {

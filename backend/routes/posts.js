@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const Post = require("../models/post");
 
+const checkAuth = require("../middleware/checkAuth");
 const multer = require("multer");
 
 const MIME_TYPE_MAP = {
@@ -28,6 +29,7 @@ const storage = multer.diskStorage({
 
 router.post(
   "",
+  checkAuth,
   multer({ storage: storage }).single("image"),
   (req, res, next) => {
     const url = req.protocol + "://" + req.get("host");
@@ -45,20 +47,22 @@ router.get("", (req, res, next) => {
   const pageSize = +req.query.pagesize;
   const currentPage = +req.query.page;
   const postQuery = Post.find();
-  let docs
+  let docs;
   if (pageSize && currentPage) {
     postQuery.skip(pageSize * (currentPage - 1)).limit(pageSize);
   }
-  postQuery.then(documents=>{
-    docs = documents
-    return Post.countDocuments()
-  }).then((count) => {
-    res.status(201).json({
-      message: "Posts fetched successfully",
-      posts: docs,
-      maxPosts:count
+  postQuery
+    .then((documents) => {
+      docs = documents;
+      return Post.countDocuments();
+    })
+    .then((count) => {
+      res.status(201).json({
+        message: "Posts fetched successfully",
+        posts: docs,
+        maxPosts: count,
+      });
     });
-  });
 });
 
 router.get("/:id", (req, res, next) => {
@@ -71,27 +75,32 @@ router.get("/:id", (req, res, next) => {
   });
 });
 
-router.put("/:id", multer({ storage: storage }).single("image"), (req, res) => {
-  let imagePath = req.body.imagePath;
-  if (req.file) {
-    const url = req.protocol + "://" + req.get("host");
-    imagePath = url + "/images/" + req.file.filename;
-  }
+router.put(
+  "/:id",
+  checkAuth,
+  multer({ storage: storage }).single("image"),
+  (req, res) => {
+    let imagePath = req.body.imagePath;
+    if (req.file) {
+      const url = req.protocol + "://" + req.get("host");
+      imagePath = url + "/images/" + req.file.filename;
+    }
 
-  const post = {
-    _id: req.params.id,
-    title: req.body.title,
-    content: req.body.content,
-    imagePath: imagePath,
-  };
-  Post.updateOne({ _id: req.params.id }, post).then((result) => {
-    res.status(201).json({
-      message: "Post updated successfully",
+    const post = {
+      _id: req.params.id,
+      title: req.body.title,
+      content: req.body.content,
+      imagePath: imagePath,
+    };
+    Post.updateOne({ _id: req.params.id }, post).then((result) => {
+      res.status(201).json({
+        message: "Post updated successfully",
+      });
     });
-  });
-});
+  }
+);
 
-router.delete("/:id", (req, res) => {
+router.delete("/:id", checkAuth, (req, res) => {
   Post.deleteOne({ _id: req.params.id }).then((result) => {
     console.log(result);
     res.status(201).json({
