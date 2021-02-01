@@ -16,7 +16,7 @@ router.post("/signup", (req, res, next) => {
         res.status(201).json({ message: "User created", result: result });
       })
       .catch((err) => {
-        res.status(500).json({ err: err });
+        res.status(500).json({ message: "User already exists" });
       });
   });
 });
@@ -30,13 +30,13 @@ router.post("/login", (req, res) => {
           message: "Auth Failed",
         });
       }
-      fetchUser=user
+      fetchUser = user;
       return bcrypt.compare(req.body.password, user.password);
     })
     .then((result) => {
       if (!result) {
         return res.status(401).json({
-          message: "Auth Failed",
+          message: "Invalid Authentication Credentials",
         });
       }
       const token = jwt.sign(
@@ -48,13 +48,14 @@ router.post("/login", (req, res) => {
       );
       res.status(201).json({
         token: token,
-        message:"Authentication successful",
-        expiresIn: 3600
-      })
+        message: "Authentication successful",
+        expiresIn: 3600,
+        userId: fetchUser._id,
+      });
     })
     .catch((err) => {
       res.status(401).json({
-        message: "Auth Failed",
+        message: "You are not authenticated",
       });
     });
 });

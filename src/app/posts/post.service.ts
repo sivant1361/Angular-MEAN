@@ -29,6 +29,7 @@ export class PostsService {
                 title: post.title,
                 content: post.content,
                 imagePath: post.imagePath,
+                creator: post.creator,
               };
             }),
             maxPosts: postData.maxPosts,
@@ -50,6 +51,7 @@ export class PostsService {
       title: string;
       content: string;
       imagePath: string;
+      creator: string;
     }>('http://localhost:3000/api/posts/' + id);
   }
 
@@ -69,7 +71,7 @@ export class PostsService {
         postData
       )
       .subscribe((response) => {
-        console.log(response.message, response.post);
+        // console.log(response.message, response.post);
         this.router.navigate(['/']);
       });
   }
@@ -88,6 +90,7 @@ export class PostsService {
         title: title,
         content: content,
         imagePath: image,
+        creator:null
       };
     }
 
