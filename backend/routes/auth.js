@@ -41,7 +41,7 @@ router.post("/login", (req, res) => {
       }
       const token = jwt.sign(
         { email: fetchUser.email, userId: fetchUser._id },
-        "i-am-not-gonna-tell-what-the-password-is",
+        process.env.JWT_KEY,
         {
           expiresIn: "1h",
         }

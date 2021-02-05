@@ -9,7 +9,7 @@ const userRoutes=require("./routes/auth")
 
 mongoose
   .connect(
-    "mongodb+srv://king:9994532266@node-netninja.4r9my.mongodb.net/posts",
+    "mongodb+srv://king:"+process.env.MONGO_ATLAS_PW+"@node-netninja.4r9my.mongodb.net/posts",
     { useNewUrlParser: true, useUnifiedTopology: true }
   )
   .then(() => {
